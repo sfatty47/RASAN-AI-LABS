@@ -28,8 +28,21 @@ pip install -r requirements.txt
 
 3. Run the application:
 ```bash
+# For local development
 streamlit run app.py
+
+# For Streamlit Cloud deployment
+streamlit run streamlit_app.py
 ```
+
+## Project Structure
+
+- `app.py`: Main application file containing the core AutoML functionality
+- `streamlit_app.py`: Entry point for Streamlit Cloud deployment
+- `requirements.txt`: Python package dependencies
+- `test.py`: Unit tests for the application
+- `DEPLOY.md`: Deployment instructions
+- `README.md`: Project documentation
 
 ## Usage
 
@@ -46,7 +59,7 @@ streamlit run app.py
 
 ## Deployment
 
-The application is deployed on Streamlit Cloud. Visit the live demo at: [RASAN AI Labs](https://share.streamlit.io/sfatty47/rasan-ai-labs/main/app.py)
+The application is deployed on Streamlit Cloud. Visit the live demo at: [RASAN AI Labs](https://share.streamlit.io/sfatty47/rasan-ai-labs/main/streamlit_app.py)
 
 ## License
 
