@@ -7,36 +7,57 @@ from app.services.model_service import model_service
 from app.services.data_service import data_service
 from app.services.visualization_service import visualization_service
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+class PredictAndVisualizeRequest(BaseModel):
+    filename: str
+    target_column: str
+    chart_types: Optional[List[str]] = None
 
 @router.post("/visualizations/{model_id}/predict-and-visualize")
 async def predict_and_visualize(
     model_id: str,
-    filename: str,
-    target_column: str,
-    chart_types: Optional[List[str]] = None
+    request: PredictAndVisualizeRequest
 ):
     """Generate predictions and create visualizations"""
     try:
+        filename = request.filename
+        target_column = request.target_column
+        chart_types = request.chart_types
+        
+        logger.info(f"Generating visualizations for model {model_id}, file {filename}, target {target_column}")
+        
         # Load model
         model_info = await model_service.load_model(model_id)
         problem_type = model_info.get("model_type", "Regression")
         loaded_model = model_service._loaded_models[model_id]["model"]
         
+        logger.info(f"Model loaded: {problem_type}")
+        
         # Load and prepare data
         file_path = f"{data_service.data_path}/{filename}"
         try:
             df = pd.read_csv(file_path.replace(".csv", "_preprocessed.csv"))
-        except:
+            logger.info("Using preprocessed data")
+        except Exception as e:
+            logger.info(f"Preprocessed file not found, using original: {e}")
             df = pd.read_csv(file_path)
+        
+        logger.info(f"Data loaded: {df.shape[0]} rows, {df.shape[1]} columns")
+        logger.info(f"Columns: {list(df.columns)}")
         
         # Separate features and target
         if target_column not in df.columns:
-            raise HTTPException(status_code=400, detail=f"Target column '{target_column}' not found")
+            raise HTTPException(status_code=400, detail=f"Target column '{target_column}' not found in dataset. Available columns: {list(df.columns)}")
         
         X = df.drop(columns=[target_column])
         y_true = df[target_column].values
+        
+        logger.info(f"Features: {X.shape[1]}, Target samples: {len(y_true)}")
         
         # Use model.predict directly for predictions
         loop = asyncio.get_event_loop()
@@ -76,12 +97,16 @@ async def predict_and_visualize(
         
         # Generate visualizations
         visualizations = {}
+        logger.info(f"Generating {len(chart_types)} chart types: {chart_types}")
         
         # Feature Importance
         if "feature_importance" in chart_types:
             try:
+                logger.info("Generating feature importance...")
                 visualizations["feature_importance"] = visualization_service.generate_feature_importance(loaded_model, X)
+                logger.info("Feature importance generated successfully")
             except Exception as e:
+                logger.error(f"Feature importance failed: {e}")
                 visualizations["feature_importance"] = {"error": str(e)}
         
         # Correlation Heatmap
@@ -128,6 +153,8 @@ async def predict_and_visualize(
             except Exception as e:
                 visualizations["prediction_distribution"] = {"error": str(e)}
         
+        logger.info(f"Generated {len(visualizations)} visualizations successfully")
+        
         return {
             "model_id": model_id,
             "problem_type": problem_type,
@@ -142,4 +169,7 @@ async def predict_and_visualize(
         raise
     except Exception as e:
         import traceback
-        raise HTTPException(status_code=500, detail=f"Visualization generation failed: {str(e)}\n{traceback.format_exc()}")
+        error_msg = f"Visualization generation failed: {str(e)}"
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=error_msg)
