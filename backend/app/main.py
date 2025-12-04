@@ -1,0 +1,43 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import uvicorn
+from app.config import settings
+from app.api.routes import upload, analysis, training, models
+
+app = FastAPI(
+    title="RASAN AI Labs API",
+    description="AI-Powered AutoML Platform",
+    version="1.0.0"
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(upload.router, prefix="/api/v1", tags=["upload"])
+app.include_router(analysis.router, prefix="/api/v1", tags=["analysis"])
+app.include_router(training.router, prefix="/api/v1", tags=["training"])
+app.include_router(models.router, prefix="/api/v1", tags=["models"])
+
+@app.get("/")
+async def root():
+    return {"message": "RASAN AI Labs API", "version": "1.0.0"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=settings.PORT,
+        reload=settings.DEBUG
+    )
