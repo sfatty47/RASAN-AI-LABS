@@ -32,14 +32,13 @@ ENV/
 Thumbs.db
 
 # Data and models (will be created at runtime)
-# IMPORTANT: Don't exclude backend/app/models/ - that's a Python package directory!
-# Only exclude root-level or runtime data/models directories
+# IMPORTANT: backend/app/models/ is a Python package, NOT a runtime directory!
+# Only exclude root-level runtime directories
 /data/
 /models/
 *.csv
-!backend/app/models/**/*.py
+!backend/app/models/**
 *.pkl
-!backend/app/models/
 
 # Environment files
 .env
