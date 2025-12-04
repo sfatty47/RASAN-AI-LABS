@@ -21,6 +21,7 @@ export default function ResultsPage() {
   const [visualizations, setVisualizations] = useState<Record<string, any>>({});
   const [loadingViz, setLoadingViz] = useState(false);
   const [targetColumn, setTargetColumn] = useState('');
+  const [vizError, setVizError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,16 +77,44 @@ export default function ResultsPage() {
   };
 
   const loadVisualizations = async (modelId: string, filename: string, target: string) => {
-    if (!filename || !target) return;
+    if (!filename || !target) {
+      setVizError('Missing filename or target column');
+      return;
+    }
     
     setLoadingViz(true);
+    setVizError(null);
+    setVisualizations({});
+    
     try {
+      console.log('Loading visualizations:', { modelId, filename, target });
       const result = await predictAndVisualize(modelId, filename, target);
+      console.log('Visualization result:', result);
+      
       if (result.visualizations) {
-        setVisualizations(result.visualizations);
+        const validViz = Object.entries(result.visualizations).filter(([key, value]) => {
+          if (value && typeof value === 'object' && 'error' in value) {
+            console.warn(`Chart ${key} failed:`, value.error);
+            return false;
+          }
+          return true;
+        });
+        
+        if (validViz.length === 0) {
+          setVizError('All visualizations failed to generate. Check backend logs for details.');
+        } else {
+          setVisualizations(Object.fromEntries(validViz));
+          if (validViz.length < Object.keys(result.visualizations).length) {
+            setVizError(`Some charts failed to generate. ${validViz.length}/${Object.keys(result.visualizations).length} charts available.`);
+          }
+        }
+      } else {
+        setVizError('No visualizations returned from server');
       }
     } catch (err: any) {
       console.error('Failed to load visualizations:', err);
+      const errorMsg = err.response?.data?.detail || err.message || 'Failed to generate visualizations';
+      setVizError(`Error: ${errorMsg}`);
     } finally {
       setLoadingViz(false);
     }
@@ -229,7 +258,13 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {!loadingViz && Object.keys(visualizations).length === 0 && (
+        {vizError && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">{vizError}</p>
+          </div>
+        )}
+
+        {!loadingViz && Object.keys(visualizations).length === 0 && !vizError && (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 mb-2">No visualizations generated yet</p>
