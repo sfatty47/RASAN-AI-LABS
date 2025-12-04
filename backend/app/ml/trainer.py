@@ -68,13 +68,27 @@ class ModelTrainer:
             if not is_classification:  # Regression
                 setup_reg(df, target=target, n_jobs=settings.N_JOBS)
                 best_model = compare_models_reg()
-                # Hyperparameter tuning
-                tuned_model = tune_model(best_model, n_iter=10)
+                # Hyperparameter tuning - skip if model doesn't support it
+                try:
+                    tuned_model = tune_model(best_model, n_iter=10)
+                except (ValueError, TypeError) as tune_error:
+                    # If tuning fails (empty parameter grid), use the best model as-is
+                    if "parameter grid" in str(tune_error).lower() or "empty" in str(tune_error).lower():
+                        tuned_model = best_model
+                    else:
+                        raise
             else:  # Classification
                 setup_clf(df, target=target, n_jobs=settings.N_JOBS)
                 best_model = compare_models_clf()
-                # Hyperparameter tuning
-                tuned_model = tune_model_clf(best_model, n_iter=10)
+                # Hyperparameter tuning - skip if model doesn't support it
+                try:
+                    tuned_model = tune_model_clf(best_model, n_iter=10)
+                except (ValueError, TypeError) as tune_error:
+                    # If tuning fails (empty parameter grid), use the best model as-is
+                    if "parameter grid" in str(tune_error).lower() or "empty" in str(tune_error).lower():
+                        tuned_model = best_model
+                    else:
+                        raise
             
             # Get metrics
             metrics_df = pull()
