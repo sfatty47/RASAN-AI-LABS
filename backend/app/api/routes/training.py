@@ -4,6 +4,7 @@ from typing import Optional, List
 import pandas as pd
 from app.services.data_service import data_service
 from app.ml.trainer import model_trainer
+from app.config import settings
 
 router = APIRouter()
 
@@ -13,6 +14,29 @@ class TrainRequest(BaseModel):
     problem_type: str
     model_name: Optional[str] = None
     features: Optional[List[str]] = None
+
+@router.get("/train/status")
+async def training_status():
+    """Check training system status"""
+    try:
+        # Check if directories exist
+        import os
+        data_dir_exists = os.path.exists(data_service.data_path)
+        model_dir_exists = os.path.exists(data_service.data_path.replace("data", "models"))
+        
+        return {
+            "status": "ready",
+            "data_path": data_service.data_path,
+            "model_path": settings.MODEL_STORAGE_PATH,
+            "data_dir_exists": data_dir_exists,
+            "model_dir_exists": model_dir_exists,
+            "n_jobs": settings.N_JOBS
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)
+        }
 
 @router.post("/train")
 async def train_model(request: TrainRequest):
