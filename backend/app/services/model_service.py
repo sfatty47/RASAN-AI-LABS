@@ -68,7 +68,7 @@ class ModelService:
             self._loaded_models[model_id] = {
                 "model": model,
                 "type": model_type,
-                "path": str(model_file_path)
+                "path": str(model_base_path)
             }
             
             return {
