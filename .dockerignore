@@ -31,11 +31,9 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Data and models (will be created at runtime)
-# CRITICAL: backend/app/models/ is a Python PACKAGE directory - DO NOT exclude it!
-# Only exclude root-level runtime directories (use absolute paths)
+# Runtime data directories (NOT backend/app/models/ which is a Python package!)
+# Only exclude root-level runtime directories, not package directories
 /data/
-/models/
 *.csv
 *.pkl
 
