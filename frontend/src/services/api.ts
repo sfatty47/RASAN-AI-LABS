@@ -51,3 +51,30 @@ export const predict = async (modelId: string, data: Record<string, any>) => {
   const response = await api.post('/predict', { model_id: modelId, data });
   return response.data;
 };
+
+export const getVisualizations = async (modelId: string) => {
+  const response = await api.get(`/visualizations/${modelId}`);
+  return response.data;
+};
+
+export const generateVisualization = async (modelId: string, chartType: string, filename?: string) => {
+  const response = await api.post(`/visualizations/${modelId}/generate`, {
+    chart_type: chartType,
+    filename: filename
+  });
+  return response.data;
+};
+
+export const predictAndVisualize = async (
+  modelId: string,
+  filename: string,
+  targetColumn: string,
+  chartTypes?: string[]
+) => {
+  const response = await api.post(`/visualizations/${modelId}/predict-and-visualize`, {
+    filename,
+    target_column: targetColumn,
+    chart_types: chartTypes
+  });
+  return response.data;
+};

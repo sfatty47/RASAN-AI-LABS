@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 from app.config import settings
-from app.api.routes import upload, analysis, training, models
+from app.api.routes import upload, analysis, training, models, visualizations
 
 app = FastAPI(
     title="RASAN AI Labs API",
@@ -25,6 +25,7 @@ app.include_router(upload.router, prefix="/api/v1", tags=["upload"])
 app.include_router(analysis.router, prefix="/api/v1", tags=["analysis"])
 app.include_router(training.router, prefix="/api/v1", tags=["training"])
 app.include_router(models.router, prefix="/api/v1", tags=["models"])
+app.include_router(visualizations.router, prefix="/api/v1", tags=["visualizations"])
 
 @app.get("/")
 async def root():
