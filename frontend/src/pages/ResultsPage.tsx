@@ -43,17 +43,22 @@ export default function ResultsPage() {
     if (trainingData) {
       const result = JSON.parse(trainingData);
       setTrainingResult(result);
+      
+      // Get target column from training result, analysis, or set from state
+      if (result.target_column) {
+        setTargetColumn(result.target_column);
+      }
+      
       loadModelInfo(result.model_id);
       
       // Auto-generate visualizations
-      if (fileData && analysisData) {
-        const analysis = JSON.parse(analysisData);
+      if (fileData) {
         const file = JSON.parse(fileData);
-        const target = analysis.target_column || targetColumn;
+        const target = result.target_column || analysisResult?.target_column || targetColumn;
         if (target && file.filename) {
           setTimeout(() => {
             loadVisualizations(result.model_id, file.filename, target);
-          }, 1000);
+          }, 1500);
         }
       }
     } else {

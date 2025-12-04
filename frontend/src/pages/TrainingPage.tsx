@@ -62,7 +62,12 @@ export default function TrainingPage() {
       });
 
       setResult(trainResult);
-      localStorage.setItem('trainingResult', JSON.stringify(trainResult));
+      // Store target column with training result for visualizations
+      const trainingResultWithTarget = {
+        ...trainResult,
+        target_column: targetColumn,
+      };
+      localStorage.setItem('trainingResult', JSON.stringify(trainingResultWithTarget));
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Training failed');
     } finally {
