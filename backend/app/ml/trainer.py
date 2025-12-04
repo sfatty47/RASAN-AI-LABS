@@ -40,13 +40,13 @@ class ModelTrainer:
                 df = df[features + [target]]
             
             if problem_type == "Regression":
-                setup_reg(df, target=target, verbose=False, n_jobs=settings.N_JOBS)
-                best_model = compare_models_reg()
+                setup_reg(df, target=target, n_jobs=settings.N_JOBS, verbose=False)
+                best_model = compare_models_reg(verbose=False)
                 # Hyperparameter tuning
                 tuned_model = tune_model(best_model, n_iter=10, verbose=False)
             else:
-                setup_clf(df, target=target, verbose=False, n_jobs=settings.N_JOBS)
-                best_model = compare_models_clf()
+                setup_clf(df, target=target, n_jobs=settings.N_JOBS, verbose=False)
+                best_model = compare_models_clf(verbose=False)
                 # Hyperparameter tuning
                 tuned_model = tune_model_clf(best_model, n_iter=10, verbose=False)
             
