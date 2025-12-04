@@ -14,6 +14,12 @@ class OpenAIService:
                 from openai import OpenAI
                 self.client = OpenAI(api_key=self.api_key)
             except ImportError:
+                # OpenAI package not installed - that's okay, service will be disabled
+                self.enabled = False
+                self.client = None
+            except Exception as e:
+                # Other errors initializing OpenAI - log but don't crash
+                print(f"OpenAI initialization warning: {e}")
                 self.enabled = False
                 self.client = None
         else:

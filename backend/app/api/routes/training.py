@@ -44,7 +44,12 @@ async def train_model(request: TrainRequest):
         )
         
         if result.get("status") == "failed":
-            raise HTTPException(status_code=500, detail=result.get("error", "Training failed"))
+            error_msg = result.get("error", "Training failed")
+            error_details = result.get("details", {})
+            full_error = f"{error_msg}"
+            if error_details.get("error_type"):
+                full_error += f" ({error_details['error_type']})"
+            raise HTTPException(status_code=500, detail=full_error)
         
         return result
     except HTTPException:

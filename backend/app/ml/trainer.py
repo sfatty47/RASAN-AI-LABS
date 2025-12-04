@@ -35,17 +35,42 @@ class ModelTrainer:
     ) -> Dict[str, Any]:
         """Synchronous training function"""
         try:
+            # Validate input data
+            if df.empty:
+                raise ValueError("Dataset is empty")
+            
+            if target not in df.columns:
+                raise ValueError(f"Target column '{target}' not found in dataset. Available columns: {list(df.columns)}")
+            
+            # Check for missing values in target
+            missing_target = df[target].isnull().sum()
+            if missing_target > 0:
+                # Remove rows with missing target values
+                df = df.dropna(subset=[target])
+                if df.empty:
+                    raise ValueError(f"After removing rows with missing target values, dataset is empty")
+            
             # Select features if specified
             if features:
+                missing_features = [f for f in features if f not in df.columns]
+                if missing_features:
+                    raise ValueError(f"Features not found in dataset: {missing_features}")
                 df = df[features + [target]]
             
+            # Ensure model storage directory exists
+            model_path = Path(settings.MODEL_STORAGE_PATH)
+            model_path.mkdir(parents=True, exist_ok=True)
+            
+            # Normalize problem type for PyCaret (handle variations)
+            is_classification = problem_type.lower() in ["binary classification", "multi-class classification", "classification"]
+            
             # Setup PyCaret - use only supported parameters for 3.3.0
-            if problem_type == "Regression":
+            if not is_classification:  # Regression
                 setup_reg(df, target=target, n_jobs=settings.N_JOBS)
                 best_model = compare_models_reg()
                 # Hyperparameter tuning
                 tuned_model = tune_model(best_model, n_iter=10)
-            else:
+            else:  # Classification
                 setup_clf(df, target=target, n_jobs=settings.N_JOBS)
                 best_model = compare_models_clf()
                 # Hyperparameter tuning
@@ -55,7 +80,6 @@ class ModelTrainer:
             metrics_df = pull()
             
             # Save model
-            model_path = Path(settings.MODEL_STORAGE_PATH)
             model_id = f"model_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}"
             save_model(tuned_model, str(model_path / model_id))
             
@@ -66,9 +90,16 @@ class ModelTrainer:
                 "status": "completed"
             }
         except Exception as e:
+            import traceback
+            error_details = {
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "traceback": traceback.format_exc()
+            }
             return {
                 "status": "failed",
-                "error": str(e)
+                "error": str(e),
+                "details": error_details
             }
 
 model_trainer = ModelTrainer()
