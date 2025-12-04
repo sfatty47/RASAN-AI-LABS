@@ -1,6 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 from pathlib import Path
+import os
+
+# Get the backend directory (parent of app directory)
+BACKEND_DIR = Path(__file__).parent.parent.parent
+ENV_FILE = BACKEND_DIR / ".env"
 
 class Settings(BaseSettings):
     # API Settings
@@ -23,10 +28,13 @@ class Settings(BaseSettings):
     N_JOBS: int = -1  # Use all CPUs
     
     model_config = SettingsConfigDict(
-        env_file=str(Path(__file__).parent.parent.parent / ".env"),  # backend/.env
+        # Try multiple locations for .env file
+        env_file=str(ENV_FILE) if ENV_FILE.exists() else ".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
-        extra="ignore"
+        extra="ignore",
+        # Also check environment variables
+        env_ignore_empty=True
     )
     
     @property
