@@ -39,16 +39,17 @@ class ModelTrainer:
             if features:
                 df = df[features + [target]]
             
+            # Setup PyCaret - use only supported parameters for 3.3.0
             if problem_type == "Regression":
-                setup_reg(df, target=target, n_jobs=settings.N_JOBS, verbose=False)
-                best_model = compare_models_reg(verbose=False)
+                setup_reg(df, target=target, n_jobs=settings.N_JOBS)
+                best_model = compare_models_reg()
                 # Hyperparameter tuning
-                tuned_model = tune_model(best_model, n_iter=10, verbose=False)
+                tuned_model = tune_model(best_model, n_iter=10)
             else:
-                setup_clf(df, target=target, n_jobs=settings.N_JOBS, verbose=False)
-                best_model = compare_models_clf(verbose=False)
+                setup_clf(df, target=target, n_jobs=settings.N_JOBS)
+                best_model = compare_models_clf()
                 # Hyperparameter tuning
-                tuned_model = tune_model_clf(best_model, n_iter=10, verbose=False)
+                tuned_model = tune_model_clf(best_model, n_iter=10)
             
             # Get metrics
             metrics_df = pull()
