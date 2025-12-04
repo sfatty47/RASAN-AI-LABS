@@ -1,0 +1,48 @@
+# Exclude everything except what we need
+RASAN-AI-LABS/
+frontend/
+*.md
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data and models (will be created at runtime)
+data/
+models/
+*.csv
+*.pkl
+
+# Environment files
+.env
+.env.*
+
+# Other
+node_modules/
+dist/
+build/
+
