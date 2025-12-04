@@ -47,9 +47,14 @@ export default function ResultsPage() {
       
       // Auto-generate visualizations
       if (fileData && analysisData) {
-        setTimeout(() => {
-          loadVisualizations(result.model_id, JSON.parse(fileData).filename, analysis.target_column);
-        }, 1000);
+        const analysis = JSON.parse(analysisData);
+        const file = JSON.parse(fileData);
+        const target = analysis.target_column || targetColumn;
+        if (target && file.filename) {
+          setTimeout(() => {
+            loadVisualizations(result.model_id, file.filename, target);
+          }, 1000);
+        }
       }
     } else {
       navigate('/training');
@@ -174,9 +179,13 @@ export default function ResultsPage() {
             <PhotoIcon className="h-6 w-6 text-primary-600" />
             <h3 className="text-2xl font-bold text-gray-900">Visualizations</h3>
           </div>
-          {uploadedFile && trainingResult && targetColumn && (
+          {uploadedFile && trainingResult && (targetColumn || analysisResult?.target_column) && (
             <button
-              onClick={() => loadVisualizations(trainingResult.model_id, uploadedFile.filename, targetColumn)}
+              onClick={() => loadVisualizations(
+                trainingResult.model_id, 
+                uploadedFile.filename, 
+                targetColumn || analysisResult?.target_column || ''
+              )}
               disabled={loadingViz}
               className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
