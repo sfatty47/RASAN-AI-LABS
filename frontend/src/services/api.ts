@@ -78,3 +78,53 @@ export const predictAndVisualize = async (
   });
   return response.data;
 };
+
+// OpenAI/AI Insights endpoints
+export const getAIStatus = async () => {
+  const response = await api.get('/ai/status');
+  return response.data;
+};
+
+export const getAIInsights = async (filename: string, targetColumn?: string) => {
+  const response = await api.post('/ai/insights', {
+    filename,
+    target_column: targetColumn || undefined
+  });
+  return response.data;
+};
+
+export const explainModelResults = async (
+  modelType: string,
+  metrics: Record<string, any>,
+  featureImportance?: Record<string, number>
+) => {
+  const response = await api.post('/ai/explain-model', {
+    model_type: modelType,
+    metrics,
+    feature_importance: featureImportance
+  });
+  return response.data;
+};
+
+export const getRecommendations = async (
+  problemType: string,
+  metrics: Record<string, any>,
+  hasMissingValues: boolean = false
+) => {
+  const response = await api.post('/ai/recommendations', null, {
+    params: {
+      problem_type: problemType,
+      has_missing_values: hasMissingValues,
+      ...metrics
+    }
+  });
+  return response.data;
+};
+
+export const askQuestion = async (question: string, context: Record<string, any>) => {
+  const response = await api.post('/ai/ask', {
+    question,
+    context
+  });
+  return response.data;
+};
