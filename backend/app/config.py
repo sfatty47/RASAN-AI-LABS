@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import os
+from pathlib import Path
 
 class Settings(BaseSettings):
     # API Settings
@@ -23,7 +24,20 @@ class Settings(BaseSettings):
     N_JOBS: int = int(os.getenv("N_JOBS", "-1"))  # Use all CPUs
     
     class Config:
-        env_file = ".env"
+        # Try multiple .env file locations
+        env_file = [
+            ".env",  # Current directory
+            Path(__file__).parent.parent.parent / ".env",  # Backend directory
+            Path(__file__).parent.parent / ".env",  # App directory (fallback)
+        ]
+        env_file_encoding = "utf-8"
         case_sensitive = True
 
 settings = Settings()
+
+# Debug: Check if OpenAI key is loaded (only in debug mode)
+if settings.DEBUG:
+    has_openai_key = bool(settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.strip())
+    print(f"[DEBUG] OpenAI API Key loaded: {has_openai_key}")
+    if has_openai_key:
+        print(f"[DEBUG] OpenAI API Key starts with: {settings.OPENAI_API_KEY[:7]}...")
