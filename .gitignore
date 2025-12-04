@@ -15,6 +15,7 @@ data/
 models/
 *.csv
 !**/test_data/*.csv
+dataset.csv
 
 # Environment
 .env
@@ -54,3 +55,5 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
+# Application specific
+logs.log
