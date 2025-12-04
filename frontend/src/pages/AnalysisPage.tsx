@@ -142,6 +142,37 @@ export default function AnalysisPage() {
               </div>
             )}
 
+            {/* AI Insights */}
+            {analysis.ai_insights && (
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <SparklesIcon className="h-6 w-6 text-purple-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">AI-Powered Insights</h3>
+                  <span className="ml-auto px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">
+                    Powered by OpenAI
+                  </span>
+                </div>
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-gray-700 whitespace-pre-line">{analysis.ai_insights}</p>
+                </div>
+              </div>
+            )}
+
+            {/* AI Not Available Notice */}
+            {analysis.ai_enabled === false && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <InformationCircleIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">AI Insights Unavailable</p>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      Set OPENAI_API_KEY in your environment variables to enable AI-powered insights and recommendations.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Data Characteristics */}
             {analysis.data_characteristics && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
