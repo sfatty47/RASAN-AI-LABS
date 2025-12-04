@@ -13,6 +13,8 @@ ENV/
 # Data
 data/
 models/
+# IMPORTANT: Include backend/app/models/ - it's a Python package, not runtime data!
+!backend/app/models/
 *.csv
 !**/test_data/*.csv
 dataset.csv
