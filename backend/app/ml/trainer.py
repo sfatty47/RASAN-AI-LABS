@@ -5,6 +5,9 @@ from pycaret.regression import setup as setup_reg, compare_models as compare_mod
 from pycaret.classification import setup as setup_clf, compare_models as compare_models_clf, tune_model as tune_model_clf
 from app.config import settings
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ModelTrainer:
     async def train(
@@ -71,9 +74,12 @@ class ModelTrainer:
                 # Hyperparameter tuning - skip if model doesn't support it
                 try:
                     tuned_model = tune_model(best_model, n_iter=10)
+                    logger.info(f"Model tuned successfully: {type(best_model).__name__}")
                 except (ValueError, TypeError) as tune_error:
                     # If tuning fails (empty parameter grid), use the best model as-is
-                    if "parameter grid" in str(tune_error).lower() or "empty" in str(tune_error).lower():
+                    error_msg = str(tune_error).lower()
+                    if "parameter grid" in error_msg or "empty" in error_msg:
+                        logger.warning(f"Model {type(best_model).__name__} doesn't support tuning, using untuned model")
                         tuned_model = best_model
                     else:
                         raise
@@ -83,9 +89,12 @@ class ModelTrainer:
                 # Hyperparameter tuning - skip if model doesn't support it
                 try:
                     tuned_model = tune_model_clf(best_model, n_iter=10)
+                    logger.info(f"Model tuned successfully: {type(best_model).__name__}")
                 except (ValueError, TypeError) as tune_error:
                     # If tuning fails (empty parameter grid), use the best model as-is
-                    if "parameter grid" in str(tune_error).lower() or "empty" in str(tune_error).lower():
+                    error_msg = str(tune_error).lower()
+                    if "parameter grid" in error_msg or "empty" in error_msg:
+                        logger.warning(f"Model {type(best_model).__name__} doesn't support tuning, using untuned model")
                         tuned_model = best_model
                     else:
                         raise
