@@ -24,7 +24,10 @@ export const preprocessData = async (filename: string) => {
 };
 
 export const analyzeData = async (filename: string, targetColumn?: string) => {
-  const response = await api.post('/analyze', { filename, target_column: targetColumn });
+  const response = await api.post('/analyze', { 
+    filename, 
+    target_column: targetColumn || undefined 
+  });
   return response.data;
 };
 
