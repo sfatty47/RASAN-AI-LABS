@@ -20,40 +20,46 @@ class ModelService:
             if model_id in self._loaded_models:
                 return {"model_id": model_id, "status": "cached", "loaded": True}
             
-            # Find model file
-            model_file = self.model_path / model_id
+            # Find model file - PyCaret saves models as .pkl files
+            # But load_model expects path without .pkl extension
+            model_base_path = self.model_path / model_id
             
-            # Try to load with PyCaret (models saved by PyCaret)
-            # PyCaret saves models as .pkl files with the model name
-            model_files = list(self.model_path.glob(f"{model_id}*.pkl"))
+            # Check if model file exists (PyCaret creates .pkl file)
+            if not model_base_path.with_suffix('.pkl').exists() and not model_base_path.exists():
+                # Try finding any matching .pkl file
+                model_files = list(self.model_path.glob(f"{model_id}*.pkl"))
+                if model_files:
+                    model_base_path = model_files[0].with_suffix('')
+                else:
+                    raise FileNotFoundError(f"Model {model_id} not found in {self.model_path}")
             
-            if not model_files:
-                raise FileNotFoundError(f"Model {model_id} not found in {self.model_path}")
-            
-            # Load the first matching model file
-            model_file_path = model_files[0]
-            
-            # Determine if it's regression or classification based on file path/name
-            # For now, we'll try both and cache the working one
+            # Determine if it's regression or classification
+            # Try both and cache the working one
             model_loaded = False
             model_type = None
+            model = None
             
+            # Try classification first
             try:
-                # Try classification first
-                model = load_model_clf(str(model_file_path).replace('.pkl', ''))
+                model = load_model_clf(str(model_base_path))
                 model_type = "classification"
                 model_loaded = True
-            except:
+            except Exception:
+                # Try regression
                 try:
-                    # Try regression
-                    model = load_model_reg(str(model_file_path).replace('.pkl', ''))
+                    model = load_model_reg(str(model_base_path))
                     model_type = "regression"
                     model_loaded = True
-                except:
+                except Exception:
                     # Try direct joblib load as fallback
-                    model = joblib.load(model_file_path)
-                    model_type = "unknown"
-                    model_loaded = True
+                    try:
+                        model_file = model_base_path.with_suffix('.pkl')
+                        if model_file.exists():
+                            model = joblib.load(model_file)
+                            model_type = "unknown"
+                            model_loaded = True
+                    except Exception:
+                        pass
             
             if not model_loaded:
                 raise ValueError(f"Could not load model {model_id}")
