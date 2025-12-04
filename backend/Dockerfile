@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy application code from backend directory
-COPY backend/ /app/
+# Copy application code (copy app directory contents directly to /app)
+COPY backend/app/ /app/
 
 # Create necessary directories
 RUN mkdir -p models data
