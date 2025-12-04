@@ -113,8 +113,63 @@ export default function ResultsPage() {
       }
     } catch (err: any) {
       console.error('Failed to load visualizations:', err);
-      const errorMsg = err.response?.data?.detail || err.message || 'Failed to generate visualizations';
-      setVizError(`Error: ${errorMsg}`);
+      
+      // Extract readable error message
+      let errorMsg = 'Failed to generate visualizations';
+      
+      if (err.response?.data) {
+        const data = err.response.data;
+        
+        // Handle FastAPI validation errors (array of objects)
+        if (Array.isArray(data.detail)) {
+          errorMsg = data.detail
+            .map((item: any) => {
+              if (typeof item === 'string') return item;
+              if (item?.msg) return item.msg;
+              if (item?.loc && item?.msg) {
+                return `${item.loc.join('.')}: ${item.msg}`;
+              }
+              if (item?.type && item?.msg) {
+                return `${item.type}: ${item.msg}`;
+              }
+              try {
+                return JSON.stringify(item, null, 2);
+              } catch {
+                return String(item);
+              }
+            })
+            .join('; ');
+        } else if (typeof data.detail === 'string') {
+          errorMsg = data.detail;
+        } else if (data.detail && typeof data.detail === 'object') {
+          // Try to extract meaningful message from object
+          if (data.detail.message) {
+            errorMsg = data.detail.message;
+          } else if (data.detail.error) {
+            errorMsg = data.detail.error;
+          } else {
+            try {
+              errorMsg = JSON.stringify(data.detail, null, 2);
+            } catch {
+              errorMsg = String(data.detail);
+            }
+          }
+        } else if (data.message) {
+          errorMsg = data.message;
+        } else if (typeof data === 'string') {
+          errorMsg = data;
+        }
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      console.error('Visualization error details:', {
+        error: err,
+        response: err.response,
+        message: errorMsg
+      });
+      
+      setVizError(errorMsg);
     } finally {
       setLoadingViz(false);
     }
