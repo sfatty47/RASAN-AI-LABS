@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import Plotly from 'plotly.js-dist-min';
+import React from 'react';
+import Plot from 'react-plotly.js';
 
 interface PlotlyChartProps {
   data: any;
@@ -7,27 +7,6 @@ interface PlotlyChartProps {
 }
 
 export default function PlotlyChart({ data, className = '' }: PlotlyChartProps) {
-  const plotRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!plotRef.current || !data) return;
-
-    // If data is already a Plotly figure object, use it directly
-    if (data.data && data.layout) {
-      Plotly.newPlot(plotRef.current, data.data, data.layout, {
-        responsive: true,
-        displayModeBar: true,
-        modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
-      });
-    }
-
-    return () => {
-      if (plotRef.current) {
-        Plotly.purge(plotRef.current);
-      }
-    };
-  }, [data]);
-
   if (!data || data.error) {
     return (
       <div className={`flex items-center justify-center h-64 bg-gray-50 rounded-lg ${className}`}>
@@ -36,12 +15,26 @@ export default function PlotlyChart({ data, className = '' }: PlotlyChartProps) 
     );
   }
 
+  // Extract data and layout from Plotly figure object
+  const plotData = data.data || [];
+  const layout = data.layout || {};
+
   return (
-    <div 
-      ref={plotRef} 
-      className={`w-full ${className}`}
-      style={{ minHeight: '400px' }}
-    />
+    <div className={`w-full ${className}`} style={{ minHeight: '400px' }}>
+      <Plot
+        data={plotData}
+        layout={{
+          ...layout,
+          autosize: true,
+          responsive: true,
+        }}
+        config={{
+          responsive: true,
+          displayModeBar: true,
+          modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
+        }}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </div>
   );
 }
-
