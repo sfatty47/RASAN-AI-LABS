@@ -1,3 +1,19 @@
+# Multi-stage build: Frontend + Backend
+
+# Stage 1: Build frontend
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy frontend package files
+COPY frontend/package*.json ./
+RUN npm ci
+
+# Copy frontend source and build
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Build backend and serve frontend
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -15,11 +31,19 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 # Copy application code - ensure proper directory structure
 COPY backend/app/ /app/app/
 
+# Copy built frontend from frontend-builder stage
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
 # Verify all critical files exist
 RUN test -f /app/app/main.py && \
     test -f /app/app/models/__init__.py && \
     test -f /app/app/models/schemas.py && \
     echo "All files verified" || (echo "Missing files!" && ls -la /app/app/ && exit 1)
+
+# Verify frontend build exists
+RUN test -d /app/frontend/dist && \
+    test -f /app/frontend/dist/index.html && \
+    echo "Frontend build verified" || (echo "Frontend build missing!" && ls -la /app/frontend/ && exit 1)
 
 # Create necessary directories
 RUN mkdir -p models data

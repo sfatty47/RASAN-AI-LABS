@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 import uvicorn
 from app.config import settings
 from app.api.routes import upload, analysis, training, models, visualizations, ai_insights, config_check
@@ -29,13 +32,71 @@ app.include_router(visualizations.router, prefix="/api/v1", tags=["visualization
 app.include_router(ai_insights.router, prefix="/api/v1", tags=["ai-insights"])
 app.include_router(config_check.router, prefix="/api/v1", tags=["config"])
 
+# Serve static files from frontend build (if it exists)
+# Check both possible locations: relative to app dir and in /app/frontend/dist
+_frontend_dist_local = Path(__file__).parent.parent.parent.parent / "frontend" / "dist"
+_frontend_dist_docker = Path("/app/frontend/dist")
+
+if _frontend_dist_docker.exists():
+    frontend_dist = _frontend_dist_docker
+elif _frontend_dist_local.exists():
+    frontend_dist = _frontend_dist_local
+else:
+    frontend_dist = None
+
+frontend_index = frontend_dist / "index.html" if frontend_dist else None
+
+if frontend_dist and frontend_index and frontend_index.exists():
+    # Mount static assets (JS, CSS, images, etc.)
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+    
+    # Serve other static files
+    static_files_dir = frontend_dist
+    _static_files = ["favicon.ico", "robots.txt", "manifest.json"]
+    for static_file in _static_files:
+        static_path = static_files_dir / static_file
+        if static_path.exists():
+            # Create route handler with closure to capture file path
+            def make_static_handler(file_path: Path):
+                async def handler():
+                    return FileResponse(str(file_path))
+                return handler
+            
+            app.get(f"/{static_file}")(make_static_handler(static_path))
+
 @app.get("/")
 async def root():
+    """Serve frontend index.html or API info"""
+    if frontend_index and frontend_index.exists():
+        return FileResponse(str(frontend_index))
     return {"message": "RASAN AI Labs API", "version": "1.0.0"}
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+# Catch-all route for SPA routing - must be last
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """
+    Serve the React app for all non-API routes.
+    This enables client-side routing for the SPA.
+    """
+    # Don't interfere with API routes
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    
+    # Don't interfere with static assets
+    if full_path.startswith("assets/"):
+        raise HTTPException(status_code=404, detail="Asset not found")
+    
+    # Serve index.html for all other routes (SPA routing)
+    if frontend_index and frontend_index.exists():
+        return FileResponse(str(frontend_index))
+    
+    raise HTTPException(status_code=404, detail="Frontend not built. Please build the frontend first.")
 
 if __name__ == "__main__":
     uvicorn.run(
