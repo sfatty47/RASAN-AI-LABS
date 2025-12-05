@@ -1,6 +1,6 @@
 # Exclude everything except what we need
 RASAN-AI-LABS/
-frontend/
+# frontend/ directory is NEEDED for multi-stage Docker build - DO NOT EXCLUDE
 *.md
 .git/
 .gitignore
