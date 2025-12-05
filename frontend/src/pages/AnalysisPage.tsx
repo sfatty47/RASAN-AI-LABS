@@ -50,29 +50,29 @@ export default function AnalysisPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Data Analysis</h2>
-        <p className="text-gray-600 mb-8">
+      <div className="bg-dark-surface rounded-lg shadow-xl border border-dark-border p-8">
+        <h2 className="text-3xl font-bold text-white mb-2">Data Analysis</h2>
+        <p className="text-gray-300 mb-8">
           Analyze your data to understand problem type and get ML recommendations.
         </p>
 
         {/* Target Column Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Target Column (Optional)
           </label>
           <select
             value={targetColumn}
             onChange={(e) => setTargetColumn(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             disabled={analyzing}
           >
-            <option value="">Select target column...</option>
+            <option value="" className="bg-dark-card">Select target column...</option>
             {uploadedFile?.column_names?.map((col: string) => (
-              <option key={col} value={col}>{col}</option>
+              <option key={col} value={col} className="bg-dark-card">{col}</option>
             ))}
           </select>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-400">
             Select the column you want to predict. Leave empty for general analysis.
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function AnalysisPage() {
         <button
           onClick={handleAnalyze}
           disabled={analyzing || !uploadedFile}
-          className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-primary-600/50 hover:shadow-primary-500/50"
         >
           {analyzing ? (
             <>
@@ -98,42 +98,42 @@ export default function AnalysisPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mt-4 bg-red-900/30 border border-red-700 rounded-lg p-4">
+            <p className="text-sm text-red-300">{error}</p>
           </div>
         )}
 
         {/* Analysis Results */}
         {analysis && (
           <div className="mt-8 space-y-6">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-2">
-              <CheckCircleIcon className="h-5 w-5 text-green-500" />
-              <p className="text-sm font-medium text-green-800">Analysis Complete!</p>
+            <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 flex items-center gap-2">
+              <CheckCircleIcon className="h-5 w-5 text-green-400" />
+              <p className="text-sm font-medium text-green-300">Analysis Complete!</p>
             </div>
 
             {/* Problem Type */}
             {analysis.problem_type && (
-              <div className="bg-primary-50 rounded-lg p-6">
+              <div className="bg-primary-900/20 border border-primary-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <ChartBarIcon className="h-6 w-6 text-primary-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Problem Type</h3>
+                  <ChartBarIcon className="h-6 w-6 text-primary-400" />
+                  <h3 className="text-lg font-semibold text-white">Problem Type</h3>
                 </div>
-                <p className="text-2xl font-bold text-primary-700">{analysis.problem_type}</p>
+                <p className="text-2xl font-bold text-primary-400">{analysis.problem_type}</p>
                 {analysis.target_column && (
-                  <p className="text-sm text-gray-600 mt-1">Target: {analysis.target_column}</p>
+                  <p className="text-sm text-gray-300 mt-1">Target: {analysis.target_column}</p>
                 )}
               </div>
             )}
 
             {/* Suitable Approaches */}
             {analysis.suitable_approaches && analysis.suitable_approaches.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recommended Approaches</h3>
+              <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Recommended Approaches</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {analysis.suitable_approaches.map((approach: string, idx: number) => (
                     <div
                       key={idx}
-                      className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-medium text-gray-700"
+                      className="px-4 py-2 bg-dark-surface border border-dark-border rounded-lg text-sm font-medium text-gray-300"
                     >
                       {approach}
                     </div>
@@ -144,28 +144,28 @@ export default function AnalysisPage() {
 
             {/* AI Insights */}
             {analysis.ai_insights && (
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+              <div className="bg-gradient-to-r from-primary-900/30 to-purple-900/30 border border-primary-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <SparklesIcon className="h-6 w-6 text-purple-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">AI-Powered Insights</h3>
-                  <span className="ml-auto px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">
+                  <SparklesIcon className="h-6 w-6 text-primary-400" />
+                  <h3 className="text-lg font-semibold text-white">AI-Powered Insights</h3>
+                  <span className="ml-auto px-2 py-1 bg-primary-900/50 text-primary-300 text-xs font-medium rounded border border-primary-700">
                     Powered by OpenAI
                   </span>
                 </div>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-gray-700 whitespace-pre-line">{analysis.ai_insights}</p>
+                  <p className="text-gray-300 whitespace-pre-line">{analysis.ai_insights}</p>
                 </div>
               </div>
             )}
 
             {/* AI Not Available Notice */}
             {analysis.ai_enabled === false && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
                 <div className="flex items-start gap-2">
-                  <InformationCircleIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
+                  <InformationCircleIcon className="h-5 w-5 text-yellow-400 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-yellow-800">AI Insights Unavailable</p>
-                    <p className="text-sm text-yellow-700 mt-1">
+                    <p className="text-sm font-medium text-yellow-300">AI Insights Unavailable</p>
+                    <p className="text-sm text-yellow-200 mt-1">
                       Set OPENAI_API_KEY in your environment variables to enable AI-powered insights and recommendations.
                     </p>
                   </div>
@@ -175,30 +175,30 @@ export default function AnalysisPage() {
 
             {/* Data Characteristics */}
             {analysis.data_characteristics && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Characteristics</h3>
+              <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Data Characteristics</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">Total Rows</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-sm text-gray-400">Total Rows</p>
+                    <p className="text-xl font-semibold text-white">
                       {analysis.data_characteristics.total_rows?.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Columns</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-sm text-gray-400">Total Columns</p>
+                    <p className="text-xl font-semibold text-white">
                       {analysis.data_characteristics.total_columns}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Numerical</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-sm text-gray-400">Numerical</p>
+                    <p className="text-xl font-semibold text-white">
                       {analysis.data_characteristics.numerical_columns}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Categorical</p>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-sm text-gray-400">Categorical</p>
+                    <p className="text-xl font-semibold text-white">
                       {analysis.data_characteristics.categorical_columns}
                     </p>
                   </div>
@@ -210,7 +210,7 @@ export default function AnalysisPage() {
             <div className="flex justify-end">
               <button
                 onClick={handleContinue}
-                className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-500 transition-all duration-200 shadow-lg shadow-primary-600/50 hover:shadow-primary-500/50"
               >
                 Continue to Training →
               </button>
@@ -221,4 +221,3 @@ export default function AnalysisPage() {
     </div>
   );
 }
-

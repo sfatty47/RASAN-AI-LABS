@@ -21,14 +21,16 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dark-main">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-dark-surface border-b border-dark-border shadow-lg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-primary-600">RASAN AI Labs</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+                  RASAN AI Labs
+                </h1>
               </div>
             </div>
             <nav className="flex space-x-8">
@@ -38,10 +40,10 @@ export default function Layout({ children }: LayoutProps) {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/50'
+                        : 'text-gray-300 hover:text-primary-400 hover:bg-dark-hover'
                     }`}
                   >
                     <item.icon className="h-5 w-5" />

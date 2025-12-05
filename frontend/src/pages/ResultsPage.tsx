@@ -226,34 +226,34 @@ export default function ResultsPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Model Information */}
       {trainingResult && (
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-dark-surface rounded-lg shadow-xl border border-dark-border p-8">
           <div className="flex items-center gap-2 mb-4">
-            <DocumentCheckIcon className="h-6 w-6 text-primary-600" />
-            <h2 className="text-3xl font-bold text-gray-900">Model Results</h2>
+            <DocumentCheckIcon className="h-6 w-6 text-primary-400" />
+            <h2 className="text-3xl font-bold text-white">Model Results</h2>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Model ID</p>
-              <p className="text-lg font-semibold text-gray-900 font-mono text-sm">
+              <p className="text-sm text-gray-400">Model ID</p>
+              <p className="text-lg font-semibold text-white font-mono text-sm">
                 {trainingResult.model_id}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Model Type</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm text-gray-400">Model Type</p>
+              <p className="text-lg font-semibold text-white">
                 {trainingResult.model_type}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Status</p>
-              <p className="text-lg font-semibold text-green-600">
+              <p className="text-sm text-gray-400">Status</p>
+              <p className="text-lg font-semibold text-green-400">
                 {modelInfo?.status || trainingResult.status}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Problem Type</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm text-gray-400">Problem Type</p>
+              <p className="text-lg font-semibold text-white">
                 {analysisResult?.problem_type || trainingResult.model_type}
               </p>
             </div>
@@ -262,11 +262,11 @@ export default function ResultsPage() {
       )}
 
       {/* Visualizations Section */}
-      <div className="bg-white rounded-lg shadow-sm p-8">
+      <div className="bg-dark-surface rounded-lg shadow-xl border border-dark-border p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <PhotoIcon className="h-6 w-6 text-primary-600" />
-            <h3 className="text-2xl font-bold text-gray-900">Visualizations</h3>
+            <PhotoIcon className="h-6 w-6 text-primary-400" />
+            <h3 className="text-2xl font-bold text-white">Visualizations</h3>
           </div>
           {uploadedFile && trainingResult && (targetColumn || analysisResult?.target_column) && (
             <button
@@ -276,7 +276,7 @@ export default function ResultsPage() {
                 targetColumn || analysisResult?.target_column || ''
               )}
               disabled={loadingViz}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 transition-all duration-200 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-primary-600/50 hover:shadow-primary-500/50"
             >
               {loadingViz ? (
                 <>
@@ -295,16 +295,16 @@ export default function ResultsPage() {
 
         {loadingViz && Object.keys(visualizations).length === 0 && (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Generating visualizations...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto mb-4"></div>
+            <p className="text-gray-300">Generating visualizations...</p>
           </div>
         )}
 
         {Object.keys(visualizations).length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {Object.entries(visualizations).map(([chartType, chartData]) => (
-              <div key={chartType} className="bg-gray-50 rounded-lg p-4">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+              <div key={chartType} className="bg-dark-card rounded-lg border border-dark-border p-4">
+                <h4 className="text-lg font-semibold text-white mb-4">
                   {getChartTitle(chartType)}
                 </h4>
                 <PlotlyChart data={chartData} />
@@ -314,32 +314,32 @@ export default function ResultsPage() {
         )}
 
         {vizError && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800 text-sm">{vizError}</p>
+          <div className="mb-4 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+            <p className="text-red-300 text-sm">{vizError}</p>
           </div>
         )}
 
         {!loadingViz && Object.keys(visualizations).length === 0 && !vizError && (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <div className="text-center py-12 bg-dark-card rounded-lg border border-dark-border">
             <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">No visualizations generated yet</p>
-            <p className="text-sm text-gray-500">Click "Regenerate Charts" to create visualizations</p>
+            <p className="text-gray-300 mb-2">No visualizations generated yet</p>
+            <p className="text-sm text-gray-400">Click "Regenerate Charts" to create visualizations</p>
           </div>
         )}
       </div>
 
       {/* Prediction Interface */}
       {uploadedFile && trainingResult && (
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-dark-surface rounded-lg shadow-xl border border-dark-border p-8">
           <div className="flex items-center gap-2 mb-4">
-            <ChartBarIcon className="h-6 w-6 text-primary-600" />
-            <h3 className="text-2xl font-bold text-gray-900">Make Predictions</h3>
+            <ChartBarIcon className="h-6 w-6 text-primary-400" />
+            <h3 className="text-2xl font-bold text-white">Make Predictions</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {Object.keys(predictionData).slice(0, 6).map((key) => (
               <div key={key}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   {key}
                 </label>
                 <input
@@ -352,14 +352,14 @@ export default function ResultsPage() {
                       [key]: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 />
               </div>
             ))}
           </div>
 
           {Object.keys(predictionData).length > 6 && (
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Showing first 6 features. All features are included in prediction.
             </p>
           )}
@@ -367,7 +367,7 @@ export default function ResultsPage() {
           <button
             onClick={handlePredict}
             disabled={predicting}
-            className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-primary-600/50 hover:shadow-primary-500/50"
           >
             {predicting ? (
               <>
@@ -383,19 +383,19 @@ export default function ResultsPage() {
           </button>
 
           {prediction && (
-            <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Prediction Result</h4>
-              <div className="bg-white rounded-lg p-4">
+            <div className="mt-6 bg-green-900/30 border border-green-700 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-white mb-2">Prediction Result</h4>
+              <div className="bg-dark-card rounded-lg p-4 border border-dark-border">
                 {Array.isArray(prediction.predictions) ? (
                   <div className="space-y-2">
                     {prediction.predictions.map((pred: number, idx: number) => (
-                      <p key={idx} className="text-2xl font-bold text-primary-600">
+                      <p key={idx} className="text-2xl font-bold text-primary-400">
                         Prediction {idx + 1}: {typeof pred === 'number' ? pred.toFixed(4) : pred}
                       </p>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-2xl font-bold text-primary-600">
+                  <p className="text-2xl font-bold text-primary-400">
                     {typeof prediction.predictions === 'number' 
                       ? prediction.predictions.toFixed(4) 
                       : prediction.predictions}
@@ -411,7 +411,7 @@ export default function ResultsPage() {
       <div className="flex gap-4">
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+          className="px-6 py-3 bg-dark-surface border border-dark-border text-gray-300 rounded-lg font-medium hover:bg-dark-hover transition-all duration-200"
         >
           Start New Project
         </button>
@@ -431,7 +431,7 @@ export default function ResultsPage() {
               a.download = `${trainingResult.model_id}_results.json`;
               a.click();
             }}
-            className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center gap-2"
+            className="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-500 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-primary-600/50 hover:shadow-primary-500/50"
           >
             <ArrowDownTrayIcon className="h-5 w-5" />
             Export Results
